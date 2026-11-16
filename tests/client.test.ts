@@ -101,6 +101,7 @@ function loadBundle(snapshot: Snapshot, writes: unknown[][], accepted = true) {
       bind: (ns: string) => (key: string, params?: Record<string, unknown>) => translate(ns, key, params),
     },
     effect: (callback: () => unknown): (() => void) => { callback(); return () => {} },
+    remote: { settings: { openSettingsDocument: async () => ({ ok: true }) } },
     slots: {
       inject: (name: string, callback: () => unknown): void => { injected.push(name); callback() },
       register: (entry: Record<string, unknown>, component: Component) => {
