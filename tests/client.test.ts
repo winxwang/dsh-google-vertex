@@ -174,7 +174,7 @@ function cardOf(registered: { entry: Record<string, unknown>; component: Compone
 test('the card claims the row slot for the google-vertex row and binds the shared namespace', () => {
   const { exported, bound, injected, registered, registeredLocales } = loadBundle(ready({ revalidatedAt: '' }), [])
 
-  assert.deepEqual(exported['inject'], ['slots', 'configForms', 'locale'])
+  assert.deepEqual(exported['inject'], ['slots', 'configForms', 'locale', 'remote'])
   assert.deepEqual(bound, ['google-vertex'])
   assert.deepEqual(injected, ['plugins.row.config', 'shell.overlay'])
   assert.deepEqual(registeredLocales, ['google-vertex'])
