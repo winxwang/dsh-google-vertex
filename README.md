@@ -1,5 +1,7 @@
 # dsh-google-vertex
 
+> **0.15.0 preview:** adds a global floating Google Vertex manager for project, region, service-account path, and Claude/Gemini model selection. The native JSON file picker is not exposed by this plugin integration yet; enter the local JSON path manually. The private key is never pasted into the UI or stored in GitHub.
+
 One Google service-account JSON file unlocks eleven models inside DeepSeek Harness: Claude Opus 4.6, Sonnet 4.6, Opus 4.5, Sonnet 4.5, Haiku 4.5, plus Gemini 3.5 Flash, 3.1 Pro Preview, 3 Flash Preview, 2.5 Pro, 2.5 Flash, 2.5 Flash-Lite.
 Install it when your model capacity already lives in a Google Cloud project and you would rather point Harness at a credential file than paste an API key.
 Nothing is copied into the harness credential store: the file is read once at mount, and each request trades a signed RS256 assertion for a cached OAuth token.
@@ -11,6 +13,8 @@ Nothing is copied into the harness credential store: the file is read once at mo
 - Streaming with tool calling on both routes. Claude emits raw JSON argument deltas; Gemini emits complete function calls and replays the thought signature Gemini 3 requires.
 - The Gemini catalog discovered from Vertex at runtime behind a five-minute cache, with the built-in list as the fallback when the provider cannot be reached. The Claude catalog is served from the configured (or built-in) list.
 - A **Refresh models** control on this plugin's row page, which drops both caches and re-reads the model picker without restarting `dsh web`.
+- A frame-wide floating **Google Vertex manager** (bottom-right `G` button) for choosing Claude/Gemini models and generating the corresponding profile YAML snippet. It can invoke DSH's native **Open configuration file** action when the client exposes it. Ordinary plugin fields are not writable through `configForms`, so the panel does not claim to save them directly.
+- **JSON import limitation:** this plugin's currently declared DSH client/Host contract does not expose a native JSON file-picker RPC. The panel therefore accepts a local absolute path and generates a YAML snippet; it does not pretend to import or save a file. Use **Open profile config file** and paste the snippet into the `google-vertex` row. Keep the service-account JSON outside the repository and never paste its `private_key` into settings.
 - Claude prompt-cache breakpoints on tools, system, and the final conversation block, with cache read/write counts reported as usage.
 - Failure codes the harness can act on: `429` → `RATE_LIMIT`, `5xx` → `SERVER`, `RESOURCE_EXHAUSTED` → `QUOTA`, oversized → `CONTEXT_WINDOW_EXCEEDED`, a stalled stream → `TIMEOUT`.
 - Environment fallbacks for the credential, project, and region.
@@ -26,7 +30,7 @@ Requires DeepSeek Harness `>=0.2.2-alpha.3 <0.3.0`. Restart DSH and refresh the 
 > would win).
 
 ```sh
-dsh plugin --profile web add --save-exact @maci0/dsh-google-vertex@0.14.2
+dsh plugin --profile web add --save-exact @maci0/dsh-google-vertex@0.15.0
 ```
 
 Pin an exact npm version. To upgrade, run the same command with the newer

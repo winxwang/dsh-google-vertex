@@ -101,6 +101,7 @@ function loadBundle(snapshot: Snapshot, writes: unknown[][], accepted = true) {
       bind: (ns: string) => (key: string, params?: Record<string, unknown>) => translate(ns, key, params),
     },
     effect: (callback: () => unknown): (() => void) => { callback(); return () => {} },
+    remote: { settings: { openSettingsDocument: async () => ({ ok: true }) } },
     slots: {
       inject: (name: string, callback: () => unknown): void => { injected.push(name); callback() },
       register: (entry: Record<string, unknown>, component: Component) => {
@@ -164,8 +165,8 @@ function ready(value: unknown, writable = true): Snapshot {
 
 /** The one card the bundle registers. */
 function cardOf(registered: { entry: Record<string, unknown>; component: Component }[]): Component {
-  assert.equal(registered.length, 1)
-  const component = registered[0]?.component
+  const match = registered.find(item => item.entry['name'] === 'plugins.row.config')
+  const component = match?.component
   assert.ok(component)
   return component
 }
@@ -173,9 +174,9 @@ function cardOf(registered: { entry: Record<string, unknown>; component: Compone
 test('the card claims the row slot for the google-vertex row and binds the shared namespace', () => {
   const { exported, bound, injected, registered, registeredLocales } = loadBundle(ready({ revalidatedAt: '' }), [])
 
-  assert.deepEqual(exported['inject'], ['slots', 'configForms', 'locale'])
+  assert.deepEqual(exported['inject'], ['slots', 'configForms', 'locale', 'remote'])
   assert.deepEqual(bound, ['google-vertex'])
-  assert.deepEqual(injected, ['plugins.row.config'])
+  assert.deepEqual(injected, ['plugins.row.config', 'shell.overlay'])
   assert.deepEqual(registeredLocales, ['google-vertex'])
   assert.equal(registered[0]?.entry['name'], 'plugins.row.config')
   // `rowConfigKey(<package name>, <row id>)`: the configure control appears on
